@@ -1,0 +1,52 @@
+eap {
+	# The initial EAP type requested.  Change this to peap if you're
+	# using peap, or tls if you're using EAP-TLS.
+	default_eap_type = ttls
+
+	# The maximum time an EAP-Session can continue for
+	timer_expire = 60
+
+	# The maximum number of ongoing EAP sessions
+	max_sessions = ${max_requests}
+
+	tls-config tls-common {
+		# CA Cert Folder
+		certdir = ${confdir}/certs
+
+		# The public certificate that your server will present
+		certificate_file = PUBLIC_KEY_FILE
+
+		# The private key for the public certificate
+		private_key_file = PRIV_KEY_FILE
+
+		# The password to decrypt 'private_key_file'
+		#private_key_password = whatever
+
+		# The certificate of the authority that issued 'certificate_file'
+		ca_file = ${certdir}/tls-ca-bundle.pem
+
+		# If your AP drops packets towards the client, try reducing this.
+		fragment_size = 1024
+		
+		include_length = yes
+        	check_crl = no
+        	cipher_list = "DEFAULT"
+
+	}
+
+	tls {
+		tls = tls-common
+	}
+
+	ttls {
+		tls = tls-common
+		default_eap_type = mschapv2
+		virtual_server = "eduroam-inner"
+	}
+
+	peap {
+		tls = tls-common
+		default_eap_type = mschapv2
+		virtual_server = "eduroam-inner"
+	}
+}
