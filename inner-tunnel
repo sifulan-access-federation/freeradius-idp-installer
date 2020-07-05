@@ -1,0 +1,72 @@
+server eduroam-inner {
+	listen {
+		type = auth
+		ipaddr = *
+		port = 18120 # Used for testing only.  Requests proxied internally.
+	}
+
+	authorize {
+		# The outer username is considered garabage for autz purposes, but 
+		# the domain portion of the outer and inner identities must match.
+		split_username_nai
+		if (noop || (&Stripped-User-Domain && \
+		    (&outer.Stripped-User-Domain != &Stripped-User-Domain))) {
+			reject
+		}
+
+		# Make the user's real identity available to anything that needs
+		# it in the outer server.
+		if (&outer.session-state:)
+			update {
+				&outer.session-state:Stripped-User-Name := &Stripped-User-Name
+			}
+		}
+
+		# EAP for PEAPv0 (EAP-MSCHAPv2)
+		inner-eap {
+			ok = return
+		}
+
+		# THIS IS SITE SPECIFIC
+		#
+		# The files module is *ONLY* used for testing.  It lets you define 
+		# credentials in a flat file, IT WILL NOT SCALE.
+		#
+		# - If you use OpenLDAP with salted password hashes you should 
+ 		#   call the 'ldap' module here and use EAP-TTLS-PAP as your EAP method.
+		# - If you use OpenLDAP with cleartext passwords you should 
+		#   call the 'ldap' module here and use EAP-TTLS or PEAPv0.
+		# - If you use an SQL DB with salted password hashes you should call 
+		#   the 'sql' module here and use EAP-TTLS-PAP as your EAP method.
+		# - If you use an SQL DB with cleartext passwords you should call 
+		#   the 'sql' module here and use EAP-TTLS or PEAPv0.
+		# - If you use Novell you should call the 'ldap' module here and 
+		#   set ``edir = yes`` in ``mods-available/ldap`` and use EAP-TTLS or
+		#   PEAPv0.
+		# - If you use Active Directory, you don't need anything here (remove 
+		#   the call to files) but you'll need to follow this 
+		#   [guide](freeradius-active-directory-integration-howto) and use 
+		#   EAP-TTLS-PAP or PEAPv0.
+		# - If you're using EAP-TLS (i'm impressed!) remove the call to files.
+		#
+		# EAP-TTLS-PAP and PEAPv0 are equally secure/insecure depending on how the 
+		# supplicant is configured. PEAPv0 has a slight edge in that you need to 
+		# crack MSCHAPv2 to get the user's password (but this is not hard).
+		files
+
+		pap
+		mschap
+	}
+
+	authenticate {
+		inner-eap
+		mschap
+		pap
+
+		# Comment pap above and uncomment the stanza below if you're using 
+		# Active Directory; this will allow it to work with EAP-TTLS/PAP.
+		#Auth-Type pap {
+		#	ntlm_auth
+		#}
+	}
+}

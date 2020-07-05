@@ -1,0 +1,29 @@
+linelog f_ticks { 
+    filename = syslog 
+    format = "" 
+    reference = "f_ticks.%{%{reply:Packet-Type}:-format}" 
+    f_ticks { 
+        Access-Accept = "F-TICKS/eduroam/1.0#REALM=%{Realm}#VISCOUNTRY=MY#VISINST=%{Operator-Name}#CSI=%{%{Calling-Station-Id}:-UnknownCSID}#RESULT=OK#" 
+        Access-Reject = "F-TICKS/eduroam/1.0#REALM=%{Realm}#VISCOUNTRY=MY#VISINST=%{Operator-Name}#CSI=%{%{Calling-Station-Id}:-UnknownCSID}#RESULT=FAIL#" 
+    } 
+}
+
+linelog eduroam_log { 
+    filename = syslog 
+    format = "" 
+    reference = "eduroam_log.%{%{reply:Packet-Type}:-format}" 
+    eduroam_log { 
+         Access-Accept = "eduroam-auth#ORG=%{request:Realm}#USER=%{User-Name}#CSI=%{%{Calling-Station-Id}:-Unknown Caller Id}#NAS=%{%{Called-Station-Id}:-Unknown Access Point}#CUI=%{%{reply:Chargeable-User-Identity}:-Unknown}#MSG=%{%{EAP-Message}:-No EAP Message}#RESULT=OK#" 
+         Access-Reject = "eduroam-auth#ORG=%{request:Realm}#USER=%{User-Name}#CSI=%{%{Calling-Station-Id}:-Unknown Caller Id}#NAS=%{%{Called-Station-Id}:-Unknown Access Point}#CUI=%{%{reply:Chargeable-User-Identity}:-Unknown}#MSG=%{%{reply:Reply-Message}:-No Failure Reason}#RESULT=FAIL#" 
+    } 
+}
+
+linelog inner_auth_log { 
+    filename = syslog 
+    format = "" 
+    reference = "inner_auth_log.%{%{reply:Packet-Type}:-format}" 
+    inner_auth_log { 
+         Access-Accept = "user-auth#VISINST=%{request:Operator-Name}#USER=%{User-Name}#CSI=%{%{Calling-Station-Id}:-Unknown Caller Id}#NAS=%{%{Called-Station-Id}:-Unknown Access Point}#CUI=%{%{%{reply:Chargeable-User-Identity}:-%{outer.reply:Chargeable-User-Identity}}:-Local User}#RESULT=OK#" 
+         Access-Reject = "user-auth#VISINST=%{request:Operator-Name}#USER=%{User-Name}#CSI=%{%{Calling-Station-Id}:-Unknown Caller Id}#NAS=%{%{Called-Station-Id}:-Unknown Access Point}#CUI=%{%{%{reply:Chargeable-User-Identity}:-%{outer.reply:Chargeable-User-Identity}}:-Local User}#RESULT=FAIL#" 
+    } 
+}
