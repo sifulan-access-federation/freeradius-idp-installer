@@ -1,0 +1,111 @@
+# The domain users will add to their username to have their credentials 
+# routed to your institution.  You will also need to register this
+# and your RADIUS server addresses with your NRO.
+operator_name = "YOUR_REALM"
+
+# The VLAN to assign eduroam visitors
+#eduroam_default_guest_vlan = "<guest-vid>"
+
+# The VLAN to assign your students/staff
+#eduroam_default_local_vlan = "<local-vid>"
+
+server eduroam {
+	listen {
+		type = auth
+		ipaddr = *
+		port = 1812
+	}
+
+	authorize {
+		# Log requests before we change them
+		linelog_recv_request
+
+		# split_username_nai is a policy in the default distribution to 
+		# split a username into username and domain.  We reject user-name 
+		# strings without domains, as they're not routable.
+		split_username_nai
+		if (noop || !&Stripped-User-Domain) {
+			reject
+		}
+
+		# Send the request to the NRO for your region.
+		# The details of the FLRs (Federation Level RADIUS servers)
+		# are in proxy.conf.
+		# You can make this condition as complex as you like, to 
+		# include additional subdomains just concatenate the conditions
+		# with &&.
+		if (&Stripped-User-Domain != "${operator_name}") {
+			update {
+				control:Load-Balance-Key := &Calling-Station-ID
+				control:Proxy-To-Realm := 'eduroam_flr'
+				
+				# Operator name (RFC 5580) identifies the network the 
+				# request originated from. It's not absolutely necessary
+				# but it helps with debugging.
+				request:Operator-Name := "1${operator_name}"
+			}
+			return
+		}
+
+		# If the EAP module returns 'ok' or 'updated', it means it has handled
+		# the request and we don't need to call any other modules in this
+		# section.
+		eap {
+			ok = return
+			updated = return
+		}
+	}
+
+	pre-proxy {
+		attr_filter.pre-proxy
+		linelog_send_proxy_request
+	}
+
+	post-proxy {
+		attr_filter.post-proxy
+		linelog_recv_proxy_response
+	}
+
+	authenticate {
+		eap
+	}
+
+	post-auth {
+		# To implement eduroam you must:
+		# - Use wireless access points or a controller which supports 
+                #   dynamic VLAN assignments.
+		# - Have that feature enabled.
+		# - Have the guest_vlan/local_vlan available to the controller,
+                #   or to all your access points.
+		# eduroam user traffic *MUST* be segregated, this is *NOT* optional.
+		#update reply {
+		#	Tunnel-Type := VLAN
+		#	Tunnel-Medium-Type := IEEE-802
+		#}
+		#if (&control:Proxy-To-Realm) {
+		#	update reply {
+		#		Tunnel-Private-Group-ID = ${eduroam_default_guest_vlan}
+		#	}
+		#}
+		#else {
+		#	update reply {
+		#		Tunnel-Private-Group-ID = ${eduroam_default_local_vlan}
+		#	}
+		#}
+
+		# We're sending a response to one of OUR network devices for one of 
+		# OUR users so provide it with the real user-identity.
+		if (&session-state:Stripped-User-Name) {
+			update reply {
+				User-Name := "%{session-state:Stripped-User-Name}@%{Stripped-User-Domain}"
+			}
+		}
+
+		linelog_send_accept
+
+		Post-Auth-Type REJECT {
+			attr_filter.access_reject
+			linelog_send_reject
+		}
+	}
+}
