@@ -50,7 +50,7 @@ echo "local0.debug /var/log/radius_auth.log" > /etc/rsyslog.d/radiusd.conf
 service rsyslog restart
 
 ## client setup
-cp clients.conf ${CONFIG_PATH}/clients.conf
+cp -f clients.conf ${CONFIG_PATH}/clients.conf
 
 ## inner-tunnel setup
 cp inner-tunnel ${CONFIG_PATH}/sites-available/eduroam-inner-tunnel
