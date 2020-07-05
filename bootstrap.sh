@@ -4,15 +4,19 @@
 VAR_REALM="university.edu.my"
 
 # Set your host certificate public key
-PUBLIC_KEY_FILE="/etc/letsencrypt/live/idp.university.edu.my/cert.pem"
+PUBLIC_KEY_FILE="/etc/letsencrypt/live/eduroam-idp.university.edu.my/cert.pem"
 
 # Set your host certificate private key
-PRIV_KEY_FILE="/etc/letsencrypt/live/idp.university.edu.my/privkey.pem"
+PRIV_KEY_FILE="/etc/letsencrypt/live/eduroam-idp.university.edu.my/privkey.pem"
 
 
 ############# DO NOT EDIT BEYOND THIS LINE #############
 
-# Download and Installstable version of freeradius 3
+# Install package dependency
+
+yum install -y gcc gcc-c++ libatomic libtalloc-devel libtool libtool-ltdl-devel net-snmp-devel net-snmp-utils readline-devel libpcap-devel libcurl-devel openldap-devel python-devel mysql-devel sqlite-devel unixODBC-devel freetds-devel samba4-devel json-c-devel
+
+# Download and Install stable version of freeradius 3
 
 INSTALL_PREFIX="/opt"
 
@@ -20,13 +24,13 @@ FR3_VERSION="release_3_0_21"
 INSTALL_PATH="${INSTALL_PREFIX}/eduroam-idp-${FR3_VERSION}"
 CONFIG_PATH="${INSTALL_PATH}/etc/raddb"
 
-yum install libatomic -y
 wget "https://github.com/FreeRADIUS/freeradius-server/archive/${FR3_VERSION}.tar.gz" -O ${FR3_VERSION}.tar.gz
 tar -zxf ${FR3_VERSION}.tar.gz
 cd freeradius-server-${FR3_VERSION}
 ./configure --prefix=${INSTALL_PATH}
 make
 make install
+ln -s ${INSTALL_PATH}/sbin/rc.radiusd /etc/rc.d/init.d/
 
 # Update Template
 
