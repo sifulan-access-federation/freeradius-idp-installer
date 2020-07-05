@@ -20,6 +20,7 @@ FR3_VERSION="release_3_0_21"
 INSTALL_PATH="${INSTALL_PREFIX}/eduroam-idp-${FR3_VERSION}"
 CONFIG_PATH="${INSTALL_PATH}/etc/raddb"
 
+yum install libatomic -y
 wget "https://github.com/FreeRADIUS/freeradius-server/archive/${FR3_VERSION}.tar.gz" -O ${FR3_VERSION}.tar.gz
 tar -zxf ${FR3_VERSION}.tar.gz
 cd freeradius-server-${FR3_VERSION}
@@ -44,6 +45,8 @@ ln -s ${CONFIG_PATH}/mods-available/eap-eduroam ${CONFIG_PATH}/mods-enabled/eap
 
 ## linelog setup
 cp linelog ${CONFIG_PATH}/mods-available/linelog-eduroam
+rm -f ${CONFIG_PATH}/mods-enabled/linelog
+ln -s ${CONFIG_PATH}/mods-available/linelog-eduroam ${CONFIG_PATH}/mods-enabled/linelog
 
 ## rsyslog setup
 echo "local0.debug /var/log/radius_auth.log" > /etc/rsyslog.d/radiusd.conf
