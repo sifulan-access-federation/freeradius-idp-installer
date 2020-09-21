@@ -26,10 +26,10 @@ A dedicated CentOS 7 (virtual or physical), with the following minimum specifica
 - The static IP MUST have a publicly resolvable DNS entry (e.g `eduroam-idp.university.edu.my`)
 - The following ports and inbound/outbound connections from/to public network (i.e. Internet) MUST be allowed:
 
-Port | Protocol | Purpose | Direction
-- | - | - | -
-80 | tcp | Letsencrypt domain validation | inbound
-2083 | tcp | radsec connection to NROs | inbound & outbound
+| Port | Protocol | Purpose | Direction |
+| - | - | - | - |
+| 80 | tcp | Letsencrypt domain validation | inbound |
+| 2083 | tcp | radsec connection to NROs | inbound & outbound |
 
 
 #### Obtain Host Certificate from Let's Encrypt
