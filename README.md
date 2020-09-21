@@ -28,7 +28,7 @@ A dedicated CentOS 7 (virtual or physical), with the following minimum specifica
 
 Port | Protocol | Purpose | Direction
 - | - | - | -
-80 | tcp | Let's encrypt domain validation | inbound
+80 | tcp | Letsencrypt domain validation | inbound
 2083 | tcp | radsec connection to NROs | inbound & outbound
 
 
