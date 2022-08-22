@@ -3,11 +3,14 @@
 # Set your eduroam REALM
 VAR_REALM="university.edu.my"
 
-# Set your host certificate public key
+# Set your host certificate public key for EAP
 PUBLIC_KEY_FILE="/etc/letsencrypt/live/eduroam-idp.university.edu.my/cert.pem"
 
-# Set your host certificate private key
+# Set your host certificate private key for EAP
 PRIV_KEY_FILE="/etc/letsencrypt/live/eduroam-idp.university.edu.my/privkey.pem"
+
+# Set your radius secret key for connection with radius NRO
+RADIUS_SECRET_KEY="secret"
 
 
 ############# DO NOT EDIT BEYOND THIS LINE #############
@@ -20,7 +23,7 @@ yum install -y gcc gcc-c++ libatomic libtalloc-devel libtool libtool-ltdl-devel 
 
 INSTALL_PREFIX="/opt"
 
-FR3_VERSION="release_3_0_21"
+FR3_VERSION="release_3_0_25"
 INSTALL_PATH="${INSTALL_PREFIX}/eduroam-idp-${FR3_VERSION}"
 CONFIG_PATH="${INSTALL_PATH}/etc/raddb"
 
@@ -57,7 +60,7 @@ echo "local0.debug /var/log/radius_auth.log" > /etc/rsyslog.d/radiusd.conf
 service rsyslog restart
 
 ## client setup
-cp -f clients.conf ${CONFIG_PATH}/clients.conf
+awk -vRADIUS_SECRET_KEY=$RADIUS_SECRET_KEY '{gsub("RADIUS_SECRET_KEY", RADIUS_SECRET_KEY); print}' clients.conf.temp > ${CONFIG_PATH}/clients.conf
 
 ## inner-tunnel setup
 cp inner-tunnel ${CONFIG_PATH}/sites-available/eduroam-inner-tunnel
@@ -70,7 +73,9 @@ ln -s ${CONFIG_PATH}/mods-available/inner-eap-eduroam ${CONFIG_PATH}/mods-enable
 
 ## radsec setup
 awk -vPRIV_KEY_FILE=$PRIV_KEY_FILE -vPUBLIC_KEY_FILE=$PUBLIC_KEY_FILE '{gsub("PRIV_KEY_FILE", PRIV_KEY_FILE); gsub("PUBLIC_KEY_FILE", PUBLIC_KEY_FILE);print}' radsec.temp > ${CONFIG_PATH}/sites-available/radsec-eduroam
-ln -s ${CONFIG_PATH}/sites-available/radsec-eduroam ${CONFIG_PATH}/sites-enabled/radsec
+
+## proxy setup
+awk -vRADIUS_SECRET_KEY=$RADIUS_SECRET_KEY '{gsub("RADIUS_SECRET_KEY", RADIUS_SECRET_KEY); print}' proxy.conf.temp > ${CONFIG_PATH}/proxy.conf
 
 ## fticks setup
 cp f_ticks.temp ${CONFIG_PATH}/mods-available/f_ticks
@@ -78,7 +83,3 @@ ln -s ${CONFIG_PATH}/mods-available/f_ticks ${CONFIG_PATH}/mods-enabled/f_ticks
 
 
 echo "done!!!"
-
-
-
-

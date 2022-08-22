@@ -1,11 +1,13 @@
 # Freeradius IdP Installer
 
 ## Overview
+
 The Freeradius IdP Installer is designed by SIFULAN Malaysian Access Federation to automate the install of version 3 for the Freerdius eduroam IdP on a dedicated CentOS 7 server. This installer was based on Freeradius' 3 basic eduroam configuration [https://wiki.freeradius.org/guide/eduroam](https://wiki.freeradius.org/guide/eduroam) with some modifications to work with eduroam Malaysian NRO's configuration.
 
 This installer is provided as it is, WITHOUT any support nor warranty.
 
 ## License
+
 Apache License Version 2.0, January 2004
 
 ## Installation Guide
@@ -15,11 +17,13 @@ Note: In this installation guide,  hostname `eduroam-idp.university.edu.my` and 
 ### Resource Requirement
 
 A dedicated CentOS 7 (virtual or physical), with the following minimum specifications:
+
 - 2 CPU cores
 - 4GB RAM
 - 10GB partition for OS
 
 #### Additional Requirement
+
 - The server MUST NOT be used for any other purpose in the future.
 - You MUST be able to execute commands as `root` on the system without limitation
 - The server MUST be accessible from the public internet.
@@ -29,30 +33,24 @@ A dedicated CentOS 7 (virtual or physical), with the following minimum specifica
 | Port | Protocol | Purpose | Direction |
 | - | - | - | - |
 | 80 | tcp | Letsencrypt domain validation | inbound |
-| 2083 | tcp | radsec connection to NROs | inbound & outbound |
-
+| 1812 | udp | radius connection to NROs | inbound & outbound |
+| 1813 | udp | radius connection to NROs | inbound & outbound |
 
 #### Obtain Host Certificate from Let's Encrypt
 
-##### Install certbot-auto
+##### Install certbot
 
-```bash
-[root@eduroam-idp ~]# wget https://dl.eff.org/certbot-auto
-[root@eduroam-idp ~]# mv certbot-auto /usr/local/bin/certbot-auto
-[root@eduroam-idp ~]# chown root /usr/local/bin/certbot-auto
-[root@eduroam-idp ~]# chmod 0755 /usr/local/bin/certbot-auto
-[root@eduroam-idp ~]# certbot-auto --install-only
-```
+Refer to [https://certbot.eff.org/](https://certbot.eff.org/) for more information.
 
 ##### Get a host certificate from Let's Encrypt
 
 ```bash
-[root@eduroam-idp ~]# certbot-auto certonly --standalone -d eduroam-idp.university.edu.my
+[root@eduroam-idp ~]# certbot certonly --standalone -d eduroam-idp.university.edu.my --preferred-chain "ISRG Root X1"
 ```
 
 ### Setup and Run freeradius-idp-installer tool
 
-##### Download and Extract freeradius-idp-installer tool
+#### Download and Extract freeradius-idp-installer tool
 
 ```bash
 [root@eduroam-idp ~]# wget https://github.com/sifulan-access-federation/freeradius-idp-installer/archive/master.zip
@@ -60,7 +58,8 @@ A dedicated CentOS 7 (virtual or physical), with the following minimum specifica
 [root@eduroam-idp ~]# cd freeradius-idp-installer-master
 [root@eduroam-idp freeradius-idp-installer-master]#
 ```
-##### Edit the Bootstrap script
+
+#### Edit the Bootstrap script
 
 ```bash
 [root@eduroam-idp freeradius-idp-installer-master]# vi bootstrap.sh
@@ -68,7 +67,7 @@ A dedicated CentOS 7 (virtual or physical), with the following minimum specifica
 
 Edit the following options according to your organization/settings:
 
-```
+```bash
 # Set your eduroam REALM
 VAR_REALM="university.edu.my"
 
@@ -77,20 +76,29 @@ PUBLIC_KEY_FILE="/etc/letsencrypt/live/eduroam-idp.university.edu.my/cert.pem"
 
 # Set your host certificate private key
 PRIV_KEY_FILE="/etc/letsencrypt/live/eduroam-idp.university.edu.my/privkey.pem"
+
+# Set your radius secret key for connection with radius NRO
+RADIUS_SECRET_KEY="secret"
 ```
+
+You can get your radius secret key for connection with radius NRO from [eduroam NRO support](mailto:support@eduroam.my).
+
 ##### Run the Bootstrap script
 
 ```bash
 [root@eduroam-idp freeradius-idp-installer-master]# ./bootstrap.sh
 ```
+
 ##### Test the freeradius installation
 
 ```bash
 [root@eduroam-idp freeradius-idp-installer-master]# cd /opt/eduroam-idp-release_3_0_21/etc/raddb/
 [root@eduroam-idp raddb]# ../../sbin/radiusd -fxx -l stdout
 ```
+
 If the command gives the output like below it means the bootstrap script ran correctly. Press `ctrl + c` to stop the process.
-```
+
+```bash
 ...
 ...
 Listening on auth+acct proto tcp address * port 2083 (TLS) bound to server eduroam
@@ -99,35 +107,47 @@ Listening on auth address * port 18120 bound to server eduroam-inner
 Listening on proxy address * port 56685
 Ready to process requests
 ```
+
 Run the service:
+
 ```bash
 [root@eduroam-idp raddb]# service rc.radiusd start
 ```
 
 ### Linking with Wi-Fi Access Point/Controller
+
 Edit `clients.conf` file:
+
 ```bash
 [root@eduroam-idp raddb]# vi clients.conf
 ```
+
 Add your Wi-Fi Access Point/Controller information by following the template below:
-```
+
+```bash
 client wireless_access_points_mgmt {
   ipaddr = <ip-address>/<cidr-mask>
   secret = <secret/password>
 }
 ```
+
 Restart `radiusd` daemon:
+
 ```bash
 [root@eduroam-idp raddb]# service rc.radiusd restart
 ```
 
 ### Linking with Directory Service
+
 #### LDAP
+
 Create `ldap` module file:
+
 ```bash
 [root@eduroam-idp raddb]# vi mods-available/ldap
 ```
-```
+
+```bash
 ldap  {
 
         server = ldap.university.edu.my <- change with your ldap server
@@ -152,16 +172,22 @@ ldap  {
 
 }
 ```
+
 Enable the `ldap` module:
+
 ```bash
 [root@eduroam-idp raddb]# ln -s mods-available/ldap mods-enabled/
 ```
+
 Edit the `inner-tunnel` configuration file:
+
 ```bash
 [root@eduroam-idp raddb]# vi site-enabled/inner-tunnel
 ```
+
 Comment `files` option and add `ldap` option:
-```
+
+```bash
 ...
 ...
 # EAP-TTLS-PAP and PEAPv0 are equally secure/insecure depending on how the
@@ -172,7 +198,9 @@ ldap
 pap
 mschap
 ```
+
 Restart `radiusd` daemon:
+
 ```bash
 [root@eduroam-idp raddb]# service rc.radiusd restart
 ```

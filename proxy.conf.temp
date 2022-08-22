@@ -1,0 +1,41 @@
+home_server local {
+	ipaddr = 127.0.0.1
+	type = auth
+	secret = radius
+}
+
+home_server_pool local {
+        type = fail-over
+        home_server = local
+}
+
+realm local {
+      auth_pool = local
+}
+
+
+home_server nro1 {
+        ipaddr          = nro1.eduroam.my
+        secret          = RADIUS_SECRET_KEY
+        type            = auth
+        status_check    = status-server
+}
+
+home_server nro2 {      
+        ipaddr          = nro2.eduroam.my
+        secret          = RADIUS_SECRET_KEY
+        type            = auth
+        status_check    = status-server
+}
+
+home_server_pool eduroam {
+        type            = fail-over
+        home_server		= nro1
+        home_server		= nro2
+        nostrip
+}
+
+realm eduroam_flr {
+	auth_pool	= eduroam
+	nostrip
+}
