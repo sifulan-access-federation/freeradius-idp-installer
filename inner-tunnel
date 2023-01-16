@@ -52,8 +52,8 @@ server eduroam-inner {
 		# EAP-TTLS-PAP and PEAPv0 are equally secure/insecure depending on how the 
 		# supplicant is configured. PEAPv0 has a slight edge in that you need to 
 		# crack MSCHAPv2 to get the user's password (but this is not hard).
-		files
-
+		#files
+		#ldap
 		pap
 		mschap
 	}
