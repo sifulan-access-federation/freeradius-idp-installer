@@ -9,7 +9,7 @@ tls {
 	private_key_file = PRIV_KEY_FILE
 	certificate_file = PUBLIC_KEY_FILE
         #private_key_password = whatever
-        ca_file = ${certdir}/tls-ca-bundle.pem
+        ca_file = ${certdir}/edupki-root-ca-cert.pem
         dh_file = ${certdir}/dh
         random_file = /dev/urandom
         fragment_size = 8096
@@ -63,8 +63,8 @@ clients radsec {
                virtual_server   = eduroam
                Operator-Name    = 1nro2.eduroam.my
                add_cui          = yes
-        } 
-	
+        }
+
 }
 
 home_server local {
@@ -117,4 +117,3 @@ realm eduroam_flr {
 	auth_pool	= eduroam
 	nostrip
 }
-

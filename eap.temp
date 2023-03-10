@@ -23,11 +23,11 @@ eap {
 		#private_key_password = whatever
 
 		# The certificate of the authority that issued 'certificate_file'
-		ca_file = ${certdir}/tls-ca-bundle.pem
+		ca_file = ${certdir}/edupki-root-ca-cert.pem
 
 		# If your AP drops packets towards the client, try reducing this.
 		fragment_size = 1024
-		
+
 		include_length = yes
         	check_crl = no
         	cipher_list = "DEFAULT"
