@@ -45,7 +45,7 @@ rm -f ${CONFIG_PATH}/sites-enabled/default
 ln -s ${CONFIG_PATH}/sites-available/eduroam ${CONFIG_PATH}/sites-enabled/default
 
 ## eap setup
-wget https://www.edupki.org/fileadmin/Documents/edupki-root-ca-cert.pem -O ${CONFIG_PATH}/certs/edupki-root-ca-cert.pem
+wget https://sifulan.my/download/tls-ca-bundle.pem -O ${CONFIG_PATH}/certs/tls-ca-bundle.pem
 awk -vPRIV_KEY_FILE=$PRIV_KEY_FILE -vPUBLIC_KEY_FILE=$PUBLIC_KEY_FILE '{gsub("PRIV_KEY_FILE", PRIV_KEY_FILE); gsub("PUBLIC_KEY_FILE", PUBLIC_KEY_FILE);print}' eap.temp > ${CONFIG_PATH}/mods-available/eap-eduroam
 rm -f ${CONFIG_PATH}/mods-enabled/eap
 ln -s ${CONFIG_PATH}/mods-available/eap-eduroam ${CONFIG_PATH}/mods-enabled/eap
@@ -70,9 +70,6 @@ ln -s ${CONFIG_PATH}/sites-available/eduroam-inner-tunnel ${CONFIG_PATH}/sites-e
 ## inner-eap setup
 cp inner-eap ${CONFIG_PATH}/mods-available/inner-eap-eduroam
 ln -s ${CONFIG_PATH}/mods-available/inner-eap-eduroam ${CONFIG_PATH}/mods-enabled/inner-eap
-
-## radsec setup
-awk -vPRIV_KEY_FILE=$PRIV_KEY_FILE -vPUBLIC_KEY_FILE=$PUBLIC_KEY_FILE '{gsub("PRIV_KEY_FILE", PRIV_KEY_FILE); gsub("PUBLIC_KEY_FILE", PUBLIC_KEY_FILE);print}' radsec.temp > ${CONFIG_PATH}/sites-available/radsec-eduroam
 
 ## proxy setup
 awk -vRADIUS_SECRET_KEY=$RADIUS_SECRET_KEY '{gsub("RADIUS_SECRET_KEY", RADIUS_SECRET_KEY); print}' proxy.conf.temp > ${CONFIG_PATH}/proxy.conf

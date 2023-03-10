@@ -101,7 +101,6 @@ If the command gives the output like below it means the bootstrap script ran cor
 ```bash
 ...
 ...
-Listening on auth+acct proto tcp address * port 2083 (TLS) bound to server eduroam
 Listening on auth address * port 1812 bound to server eduroam
 Listening on auth address * port 18120 bound to server eduroam-inner
 Listening on proxy address * port 56685
