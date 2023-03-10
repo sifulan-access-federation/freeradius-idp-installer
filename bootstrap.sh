@@ -23,7 +23,7 @@ yum install -y gcc gcc-c++ libatomic libtalloc-devel libtool libtool-ltdl-devel 
 
 INSTALL_PREFIX="/opt"
 
-FR3_VERSION="release_3_0_25"
+FR3_VERSION="release_3_2_2"
 INSTALL_PATH="${INSTALL_PREFIX}/eduroam-idp-${FR3_VERSION}"
 CONFIG_PATH="${INSTALL_PATH}/etc/raddb"
 
@@ -69,7 +69,7 @@ ln -s ${CONFIG_PATH}/sites-available/eduroam-inner-tunnel ${CONFIG_PATH}/sites-e
 
 ## inner-eap setup
 cp inner-eap ${CONFIG_PATH}/mods-available/inner-eap-eduroam
-ln -s ${CONFIG_PATH}/mods-available/inner-eap-eduroam ${CONFIG_PATH}/mods-enabled/inner-eap 
+ln -s ${CONFIG_PATH}/mods-available/inner-eap-eduroam ${CONFIG_PATH}/mods-enabled/inner-eap
 
 ## radsec setup
 awk -vPRIV_KEY_FILE=$PRIV_KEY_FILE -vPUBLIC_KEY_FILE=$PUBLIC_KEY_FILE '{gsub("PRIV_KEY_FILE", PRIV_KEY_FILE); gsub("PUBLIC_KEY_FILE", PUBLIC_KEY_FILE);print}' radsec.temp > ${CONFIG_PATH}/sites-available/radsec-eduroam
