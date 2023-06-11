@@ -54,7 +54,7 @@ Refer to [https://certbot.eff.org/](https://certbot.eff.org/) for more informati
 
 ```bash
 [root@eduroam-idp ~]# wget https://github.com/sifulan-access-federation/freeradius-idp-installer/archive/master.zip
-[root@eduroam-idp ~]# unzip master.unzip
+[root@eduroam-idp ~]# unzip master.zip
 [root@eduroam-idp ~]# cd freeradius-idp-installer-master
 [root@eduroam-idp freeradius-idp-installer-master]#
 ```
