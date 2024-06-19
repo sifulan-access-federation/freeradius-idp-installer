@@ -15,14 +15,14 @@ realm local {
 
 
 home_server nro1 {
-    ipaddr          = nro1.eduroam.my
+    ipaddr          = 203.80.20.220
     secret          = RADIUS_SECRET_KEY
     type            = auth
     status_check    = status-server
 }
 
 home_server nro2 {
-    ipaddr          = nro2.eduroam.my
+    ipaddr          = 150.129.185.5
     secret          = RADIUS_SECRET_KEY
     type            = auth
     status_check    = status-server

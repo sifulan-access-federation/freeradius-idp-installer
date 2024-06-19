@@ -5,22 +5,22 @@ client localhost {
 }
 
 client nro1 {
-    ipaddr          = nro1.eduroam.my
+    ipaddr          = 203.80.20.220
     secret          = RADIUS_SECRET_KEY
     shortname       = nro1
     nas_type        = other
     virtual_server  = eduroam
-    Operator-Name   = 1nro1.eduroam.my
+    Operator-Name   = 1nro.eduroam.my
     add_cui         = yes
 }
 
 client nro2 {
-    ipaddr          = nro2.eduroam.my
+    ipaddr          = 150.129.185.5
     secret          = RADIUS_SECRET_KEY
     shortname       = nro2
     nas_type        = other
     virtual_server  = eduroam
-    Operator-Name   = 1nro2.eduroam.my
+    Operator-Name   = 1nro.eduroam.my
     add_cui         = yes
 } 
 
