@@ -34,7 +34,7 @@ server eduroam {
 		# You can make this condition as complex as you like, to 
 		# include additional subdomains just concatenate the conditions
 		# with &&.
-		if (&Stripped-User-Domain !~ /${operator_name}$$/)
+		if (&Stripped-User-Domain !~ /${operator_name}$$/) {
 			update {
 				control:Load-Balance-Key := &Calling-Station-ID
 				control:Proxy-To-Realm := 'eduroam_flr'
